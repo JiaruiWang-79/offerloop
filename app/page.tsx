@@ -6,10 +6,7 @@ type Step = 'overview' | 'jd' | 'evidence' | 'decision' | 'interview' | 'review'
 
 const navItems: { id: Step; label: string; icon: string; count?: string }[] = [
   { id: 'overview', label: '总览', icon: '⌂' },
-  { id: 'jd', label: '岗位拆解', icon: '▤', count: '6' },
-  { id: 'evidence', label: '经历证据库', icon: '◈', count: '5' },
-  { id: 'decision', label: '投递建议', icon: '↗' },
-  { id: 'interview', label: '面试评分表', icon: '✦' },
+  { id: 'jd', label: '投递岗位', icon: '▤', count: '10' },
   { id: 'review', label: '面试复盘', icon: '↻' },
 ];
 
@@ -57,14 +54,14 @@ export default function Home() {
       <aside className="sidebar">
         <div className="brand-lockup"><div className="brand-mark">O</div><div><strong>OfferLoop</strong><span>Evidence-first career copilot</span></div></div>
         <div className="profile-card"><div className="avatar">林</div><div><strong>林然</strong><span>AI 产品经理候选人</span></div><button className="more-button" aria-label="更多设置">•••</button></div>
-        <nav className="side-nav" aria-label="主导航"><p className="nav-heading">工作台</p>{navItems.map((item) => <button key={item.id} className={`nav-item ${active === item.id ? 'active' : ''}`} onClick={() => setActive(item.id)}><span className="nav-icon">{item.icon}</span><span>{item.label}</span>{item.count && <em>{item.count}</em>}</button>)}<p className="nav-heading lower">我的材料</p><button className="nav-item" onClick={() => setActive('evidence')}><span className="nav-icon">▧</span><span>申请材料包</span></button></nav>
+        <nav className="side-nav" aria-label="主导航"><p className="nav-heading">工作台</p>{navItems.map((item) => <button key={item.id} className={`nav-item ${active === item.id ? 'active' : ''}`} onClick={() => setActive(item.id)}><span className="nav-icon">{item.icon}</span><span>{item.label}</span>{item.count && <em>{item.count}</em>}</button>)}<p className="nav-heading lower">我的材料</p><button className="nav-item" onClick={() => setActive('evidence')}><span className="nav-icon">◈</span><span>我的经历</span></button></nav>
         <div className="privacy-note"><span>⌁</span><div><strong>隐私优先</strong><p>当前使用匿名模拟数据<br />不会上传真实个人资料</p></div></div>
         <div className="sidebar-footer"><span className="status-dot" /> Demo workspace <span>v0.1</span></div>
       </aside>
       <section className="content-area">
         <header className="topbar"><div className="breadcrumb"><span>工作台</span><b>/</b><strong>{activeLabel}</strong></div><div className="top-actions"><button className="icon-button" aria-label="帮助">?</button><button className="text-button">导入经历</button><button className="primary-button small" onClick={() => setActive('jd')}>+ 分析新岗位</button></div></header>
         {active === 'overview' && <Overview onNavigate={setActive} />}
-        {active === 'jd' && <JDPanel />}
+        {active === 'jd' && <JDPanel onNavigate={setActive} />}
         {active === 'evidence' && <EvidencePanel />}
         {active === 'decision' && <DecisionPanel onNavigate={setActive} />}
         {active === 'interview' && <InterviewPanel />}
@@ -95,8 +92,8 @@ function StatCard({ value, label, tone }: { value: string; label: string; tone?:
 function ScheduleItem({ date, title, type, color }: { date: string; title: string; type: string; color: string }) { return <div className="schedule-item"><span className={`schedule-dot ${color}`} /><div><small>{date}</small><strong>{title}</strong></div><em>{type}</em></div>; }
 function RecentItem({ company, role, date, status }: { company: string; role: string; date: string; status: string }) { return <div className="recent-item"><div className="company-dot">{company.slice(0, 1)}</div><div><strong>{company}</strong><span>{role}</span></div><small>{date}</small><em>{status}</em><button>→</button></div>; }
 
-function JDPanel() {
-  return <div className="page-wrap"><PageIntro eyebrow="01 / 岗位拆解" title="AI 产品经理实习生" desc="先理解岗位真正需要什么，再去看自己的经历是否能证明。" action={<button className="outline-button">编辑 JD</button>} /><div className="job-banner"><div className="company-logo">Z</div><div><strong>智行机器人</strong><span>AI 产品经理实习生 · 上海 / 混合办公</span></div><span className="job-tag">正在分析</span></div><div className="section-heading compact"><div><p className="eyebrow">岗位能力地图</p><h2>招聘方真正想确认的 6 件事</h2></div><span className="muted-label">依据 JD 原文拆解</span></div><div className="requirement-list">{requirements.map((item, index) => <div className="requirement-row" key={item.title}><div className="number">0{index + 1}</div><div className="requirement-main"><div className="requirement-title"><strong>{item.title}</strong><span className={`level ${item.level === '加分' ? 'bonus' : ''}`}>{item.level}</span></div><p>{item.source}</p><div className="linked-evidence"><StatusPill status={item.status} /><span>{item.evidence}</span></div></div><div className="score-column"><strong>{item.score}</strong><span>证据覆盖</span></div><span className="row-arrow">→</span></div>)}</div></div>;
+function JDPanel({ onNavigate }: { onNavigate: (step: Step) => void }) {
+  return <div className="page-wrap"><PageIntro eyebrow="投递岗位 · 01" title="AI 产品经理实习生" desc="一个岗位里，看清楚对方要什么，以及你现在能证明什么。" action={<button className="primary-button">＋ 新增岗位</button>} /><div className="job-banner"><div className="company-logo">Z</div><div><strong>智行机器人</strong><span>AI 产品经理实习生 · 上海 / 混合办公</span></div><span className="job-tag">正在分析</span></div><div className="section-heading compact"><div><p className="eyebrow">JD 拆解</p><h2>招聘方真正想确认的 6 件事</h2></div><button className="outline-button">编辑 JD</button></div><div className="requirement-list">{requirements.map((item, index) => <div className="requirement-row" key={item.title}><div className="number">0{index + 1}</div><div className="requirement-main"><div className="requirement-title"><strong>{item.title}</strong><span className={`level ${item.level === '加分' ? 'bonus' : ''}`}>{item.level}</span></div><p>{item.source}</p><div className="linked-evidence"><StatusPill status={item.status} /><span>{item.evidence}</span></div></div><div className="score-column"><strong>{item.score}</strong><span>证据覆盖</span></div><span className="row-arrow">→</span></div>)}</div><div className="apply-insight-grid"><div className="match-card card"><div className="card-title"><div><p className="eyebrow">我的匹配</p><h3>这家公司想找什么样的人？</h3></div><span className="muted-label">基于 JD + 你的经历</span></div><p className="profile-summary">偏用户洞察、问题定义和 AI 场景设计的产品候选人。适合先从用户与产品问题切入，再补充数据验证和机器人领域项目。</p><div className="match-tags"><span>用户研究 · 强</span><span>AI 产品理解 · 中</span><span>数据实验 · 缺口</span><span>机器人经验 · 缺口</span></div><button className="text-link" onClick={() => onNavigate('evidence')}>查看我的经历 →</button></div><div className="gap-card card"><div className="gap-card-head"><div><p className="eyebrow">投递积累</p><h3>投递 10 个岗位后</h3></div><strong>10 / 10</strong></div><div className="gap-progress"><span /></div><p>系统会从多个 JD 的共同要求里，整理出你反复遇到的能力缺口。</p><div className="gap-result"><span>当前最值得补充</span><strong>数据实验与结果证明</strong><small>已在 6 个岗位中出现</small></div><button className="primary-button small" onClick={() => window.alert('已生成补充计划：数据实验与结果证明')}>生成我的补充计划 →</button></div></div></div>;
 }
 
 function EvidencePanel() {
